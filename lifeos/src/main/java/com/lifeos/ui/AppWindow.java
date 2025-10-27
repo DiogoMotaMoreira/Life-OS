@@ -16,7 +16,7 @@ public class AppWindow extends BasicWindow {
     private Panel mainContentPanel; // O painel que vai mudar de conteúdo
 
     public AppWindow() {
-        super("Meu Life OS (Java Edition)");
+        super("LIFE OS");
         setHints(Arrays.asList(Hint.CENTERED, Hint.EXPANDED));
 
         // Layout principal
@@ -27,6 +27,7 @@ public class AppWindow extends BasicWindow {
         menuPanel.addComponent(new Button("Dashboard", () -> showDashboard()));
         menuPanel.addComponent(new Button("Tarefas", () -> showTodoScreen()));
         menuPanel.addComponent(new Button("Notas", () -> showNotesScreen()));
+        menuPanel.addComponent(new Button("Projetos"));
         menuPanel.addComponent(new Separator(Direction.HORIZONTAL));
         menuPanel.addComponent(new Button("Sair", () -> close()));
         
@@ -50,12 +51,17 @@ public class AppWindow extends BasicWindow {
 
     private void showTodoScreen() {
         mainContentPanel.removeAllComponents();
-        // Cria uma instância do teu ecrã de To-Do e adiciona-a
         mainContentPanel.addComponent(new TodoScreen()); 
     }
 
     private void showNotesScreen() {
         mainContentPanel.removeAllComponents();
         mainContentPanel.addComponent(new Label("Módulo de Notas (em construção)"));
+    }
+
+    private void showProjectsScreen() {
+        mainContentPanel.removeAllComponents();
+        mainContentPanel.addComponent(new Label("Os meus Projetos"));
+        
     }
 }

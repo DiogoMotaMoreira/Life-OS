@@ -1,8 +1,8 @@
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\db\DatabaseManager.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\db\models\Note.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\db\models\Task.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\Main.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\services\NoteService.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\services\TaskService.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\ui\AppWindow.java
-C:\Users\Utilizador\Documents\GitHub\Life-OS\lifeos\src\main\java\com\lifeos\ui\TodoScreen.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/db/models/Task.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/ui/AppWindow.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/db/models/Note.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/Main.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/services/TaskService.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/services/NoteService.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/ui/TodoScreen.java
+/home/moreira/Life-OS/lifeos/src/main/java/com/lifeos/db/DatabaseManager.java
