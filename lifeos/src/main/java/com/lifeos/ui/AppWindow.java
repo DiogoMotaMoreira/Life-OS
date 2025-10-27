@@ -51,7 +51,7 @@ public class AppWindow extends BasicWindow {
 
     private void showTodoScreen() {
         mainContentPanel.removeAllComponents();
-        mainContentPanel.addComponent(new TodoScreen()); 
+        mainContentPanel.addComponent(new TodoScreen());
     }
 
     private void showNotesScreen() {

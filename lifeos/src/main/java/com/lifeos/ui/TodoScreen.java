@@ -6,15 +6,23 @@ import java.util.regex.Pattern;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+
 import com.lifeos.db.models.Task;
+import com.lifeos.db.models.Project;
 import com.lifeos.services.TaskService;
+import com.lifeos.services.ProjectService;
+
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 
 public class TodoScreen extends Panel {
 
     private final TaskService taskService;
+    private final TaskService taskDoneService;
     private final ActionListBox taskListBox;
+    private final ActionListBox taskDoneListBox;
+
+    private final ProjectService projectService;
 
     // Campos de input do formulário
     private final TextBox tituloBox;
@@ -30,7 +38,15 @@ public class TodoScreen extends Panel {
 
         super(new BorderLayout());
         this.taskService = new TaskService();
+        this.taskDoneService = new TaskService();
         this.taskListBox = new ActionListBox();
+        this.taskDoneListBox = new ActionListBox();
+
+        this.projectService = new ProjectService();
+
+        LinearLayout contentLayout = new LinearLayout();
+        this.setLayoutManager(contentLayout);
+        contentLayout.setSpacing(1);
 
 
         // ------------ FORM PANEL -----------------
@@ -74,7 +90,7 @@ public class TodoScreen extends Panel {
         instPanel.addComponent(new Label("  * -> Elementos Obrigatórios"));
         instPanel.addComponent(new Label("  Prioridades: 1- Baixa  5- Elevada"));
         instPanel.addComponent(new Label("  Projetos (Digite o número identificador): "));
-        //  -------------------> Mostrar a lista de projetos com o ID
+        loadProjects(instPanel);
 
 
         formPanel.addComponent(instPanel);
@@ -82,12 +98,17 @@ public class TodoScreen extends Panel {
         addComponent(formPanel, BorderLayout.Location.TOP);
 
 
-         // ---------------- Lista de Tarefas ------------
+        // ---------------- Lista de Tarefas ------------
         Panel tarefasPanel = new Panel(new LinearLayout());
         tarefasPanel.addComponent(new Label("Tarefas: "));
         tarefasPanel.addComponent(this.taskListBox);
 
+        Panel tarefasConcluidasPanel = new Panel(new LinearLayout());
+        tarefasConcluidasPanel.addComponent(new Label("Tarefas Concluídas: "));
+        tarefasConcluidasPanel.addComponent(this.taskDoneListBox);
+
         addComponent(tarefasPanel);
+        addComponent(tarefasConcluidasPanel);
 
         loadTasks();
         
@@ -108,7 +129,7 @@ public class TodoScreen extends Panel {
                 return;
             }
 
-            if (projeto < 0 || projeto > projetosLength) {
+            if (projeto < 0 || projeto > projectService.getProjects().size()) {
                 MessageDialog.showMessageDialog((WindowBasedTextGUI) this.getTextGUI(), "Erro de Validação", "Número inválido em projeto");
                 return;
             }
@@ -140,24 +161,56 @@ public class TodoScreen extends Panel {
 
     private void loadTasks() {
         taskListBox.clearItems();
+        taskDoneListBox.clearItems();
+
+
         List<Task> tasks = taskService.getPendingTasks();
         for (Task task : tasks) {
             // Adiciona uma "ação" (Runnable) a cada item da lista
             taskListBox.addItem(
                 String.format("[P%d] %s", task.prioridade(), task.titulo()),
-                () -> showTaskOptions(task) // Ação a correr ao pressionar "Enter"
+                () -> showTaskOptions(task, false) // Ação a correr ao pressionar "Enter"
+            );
+        }
+
+
+        List<Task> tasksDone = taskDoneService.getDoneTasks();
+        for (Task task : tasksDone) {
+            // Adiciona uma "ação" (Runnable) a cada item da lista
+            taskDoneListBox.addItem(
+                String.format("[P%d] %s", task.prioridade(), task.titulo()),
+                () -> showTaskOptions(task, true) // Ação a correr ao pressionar "Enter"
             );
         }
     }
 
-    private void showTaskOptions(Task task) {
+    private void loadProjects(Panel panel) {
+
+        List<Project> projects = projectService.getProjects();
+        for (Project project : projects) {
+            
+            panel.addComponent(new Label(String.format("    [%d] %s", project.id(), project.titulo())));
+        }
+
+
+        List<Task> tasksDone = taskDoneService.getDoneTasks();
+        for (Task task : tasksDone) {
+            // Adiciona uma "ação" (Runnable) a cada item da lista
+            taskDoneListBox.addItem(
+                String.format("[P%d] %s", task.prioridade(), task.titulo()),
+                () -> showTaskOptions(task, true) // Ação a correr ao pressionar "Enter"
+            );
+        }
+    }
+
+    private void showTaskOptions(Task task, Boolean done) {
 
         final WindowBasedTextGUI textGUI = (WindowBasedTextGUI) this.getTextGUI();
         Runnable actionConcluir = new Runnable() {
             @Override
             public void run(){
             // logica 
-
+            taskService.completeTask(task.id());
             loadTasks();
             MessageDialog.showMessageDialog( textGUI , "Sucesso", "Tarefa '" + task.titulo() + "' completada!");
             }
@@ -171,10 +224,8 @@ public class TodoScreen extends Panel {
         Runnable actionEliminar = new Runnable() {
             
             @Override
-            public void run(){
-            // Lógica para chamar o taskService.deleteTask(task.id())
-            // (Tens de implementar isto no teu TaskService)
-            // taskService.deleteTask(task.id()); 
+            public void run(){          
+            taskService.deleteTask(task.id()); 
 
             loadTasks();
             MessageDialog.showMessageDialog(textGUI, "Sucesso", "Tarefa '" + task.titulo() + "' eliminada!");
@@ -185,15 +236,26 @@ public class TodoScreen extends Panel {
         };
 
         
-        ActionListDialog.showDialog(
+        if (!done){ 
+            ActionListDialog.showDialog(
             textGUI,
             task.titulo(),
             task.descricao(),
 
             //butões
-            actionConcluir,
+            actionConcluir ,
             actionEliminar
         );
+        } else {
+            ActionListDialog.showDialog(
+            textGUI,
+            task.titulo(),
+            task.descricao(),
+
+            //butões
+            actionEliminar
+        );
+        }
     }
 
     private void markTaskAsDone(Task task) {
