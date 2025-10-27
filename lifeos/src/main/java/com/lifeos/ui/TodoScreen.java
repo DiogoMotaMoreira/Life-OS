@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.lifeos.db.models.Task;
 import com.lifeos.services.TaskService;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 
 public class TodoScreen extends Panel {
 
@@ -144,9 +145,55 @@ public class TodoScreen extends Panel {
             // Adiciona uma "ação" (Runnable) a cada item da lista
             taskListBox.addItem(
                 String.format("[P%d] %s", task.prioridade(), task.titulo()),
-                () -> markTaskAsDone(task) // Ação a correr ao pressionar "Enter"
+                () -> showTaskOptions(task) // Ação a correr ao pressionar "Enter"
             );
         }
+    }
+
+    private void showTaskOptions(Task task) {
+
+        final WindowBasedTextGUI textGUI = (WindowBasedTextGUI) this.getTextGUI();
+        Runnable actionConcluir = new Runnable() {
+            @Override
+            public void run(){
+            // logica 
+
+            loadTasks();
+            MessageDialog.showMessageDialog( textGUI , "Sucesso", "Tarefa '" + task.titulo() + "' completada!");
+            }
+
+            @Override
+            public String toString(){
+                return "Concluir";
+            }
+        };
+
+        Runnable actionEliminar = new Runnable() {
+            
+            @Override
+            public void run(){
+            // Lógica para chamar o taskService.deleteTask(task.id())
+            // (Tens de implementar isto no teu TaskService)
+            // taskService.deleteTask(task.id()); 
+
+            loadTasks();
+            MessageDialog.showMessageDialog(textGUI, "Sucesso", "Tarefa '" + task.titulo() + "' eliminada!");
+            }
+
+            @Override
+            public String toString(){return "Eliminar";}
+        };
+
+        
+        ActionListDialog.showDialog(
+            textGUI,
+            task.titulo(),
+            task.descricao(),
+
+            //butões
+            actionConcluir,
+            actionEliminar
+        );
     }
 
     private void markTaskAsDone(Task task) {
